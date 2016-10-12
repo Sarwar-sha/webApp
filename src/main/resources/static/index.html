@@ -1,0 +1,179 @@
+<!doctype html>
+<html data-ng-app>
+<head>
+<title>AngularJS Application</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js"></script>
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+
+</head>
+<style>
+table, th, td {
+	border: 1px solid grey;
+	border-collapse: collapse;
+	padding: 5px;
+}
+
+table tr:nth-child(odd) {
+	background-color: #f1f1f1;
+}
+
+table tr:nth-child(even) {
+	background-color: #ffffff;
+}
+</style>
+
+<body>
+	<div ng-app="person" ng-controller="personsCtrl">
+		<h3></h3>
+		<p>
+			Person Id: <input type="text" data-ng-model="id"
+				ng-pattern-restrict="[0-9]+" pattern="[0-9]+">
+			<button class="btn btn-success" ng-click="Read()">
+				<span class="glyphicon glyphicon-search"></span>
+			</button>
+
+			<button class="btn btn-success" ng-click="Delete()">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+		</p>
+
+		<br>
+		<table>
+			<tr>
+				<th>First name</th>
+				<th>Last name</th>
+				<th>Phone number</th>
+				<th>Email address</th>
+				<th>Start date</th>
+				<th>End date</th>
+				<th>Login</th>
+			</tr>
+			<tr>
+				<td>{{personRecord.firstName }}</td>
+				<td>{{personRecord.lastName }}</td>
+				<td>{{personRecord.phoneNumber}}</td>
+				<td>{{personRecord.emailAddress }}</td>
+				<td>{{personRecord.startDate | date: 'shortDate'}}</td>
+				<td>{{personRecord.endDate | date: 'shortDate'}}</td>
+				<td>{{personRecord.login }}</td>
+		</table>
+
+		<!-- end of reading and deleting record -->
+		<hr>
+
+		<button class="btn btn-success" ng-click="create()">
+			<span class="glyphicon glyphicon-plus"></span> Create New Person
+		</button>
+		<form>
+			Person Id:<br> <input type="text" data-ng-model="personId">
+		</form>
+		<form>
+			first name:<br> <input type="text" data-ng-model="firstName">
+		</form>
+		<form>
+			last name:<br> <input type="text" data-ng-model="lastName">
+		</form>
+		<form>
+			Phone number:<br> <input type="text" data-ng-model="phoneNumber">
+		</form>
+		<form>
+			Email Address:<br> <input type="text"
+				data-ng-model="emailAddress">
+		</form>
+		<form>
+			Start Date:<br> <input type="text" data-ng-model="startDate">
+		</form>
+		<form>
+			End Date:<br> <input type="text" data-ng-model="endDate">
+		</form>
+		<form>
+			Login:<br> <input type="text" data-ng-model="login">
+		</form>
+		<form>
+			Password:<br> <input type="password" data-ng-model="password">
+		</form>
+
+	</div>
+	<script src="http://code.angularjs.org/1.2.10/angular-resource.min.js"></script>
+	<script>
+    
+    
+    
+    var myApp = angular.module("person", [ "ngResource" ]);
+        myApp.controller('personsCtrl',
+                [ "$scope", "$resource", function($scope, $resource) {
+                    
+                    var ctrlParams = {id: '@id',
+                            firstName:'@firstName',
+                            lastName:'@lastName',
+                            phoneNumber:'@phoneNumber',
+                            emailAddress: '@emailAddress',
+                            startDate:'@startDate',
+                            endDate:'@endDate',
+                            login:'@login',
+                            password:'@password'};
+                    
+                                    //localhost:8080
+                    var users = $resource('/:person', {person:'@person'},
+                        { 'get':    {method:'GET'},
+                          'save':   {method:'POST',params: ctrlParams},
+                          'update':{method:'PUT',params: ctrlParams},
+                          'query':  {method:'GET', isArray:true},
+                          'remove': {method:'DELETE'},
+                          'delete': {method:'DELETE'} }, {});
+                    
+                    $scope.Read = function() {
+                        $scope.personRecord = users.get({
+                            id : $scope.id
+                        });
+                    };
+                    $scope.GetAll = function() {
+                        $scope.persons = users.query({
+                            all : 'all'
+                        });
+                        
+                        console.log($scope.persons);
+                    };
+                    $scope.Delete = function() {
+                            if (confirm("Do you want to Delete person ?")) {
+                                users.delete({
+                                    id: $scope.id
+                                }
+                                        );
+                                    alert("Person delete succefully");
+                            }
+                                        };
+                    $scope.data = function(){
+                         var data =  {
+                                 id:  $scope.personId,
+                                 firstName: $scope.firstName,
+                                 lastName: $scope.lastName,
+                                 phoneNumber: $scope.phoneNumber,
+                                 emailAddress:$scope.emailAddress,
+                                 startDate: $scope.startDate,
+                                 endDate: $scope.endDate,
+                                 login: $scope.login,
+                                 password: $scope.password } ;
+                         return data;
+                        
+                    }
+                         
+                    $scope.create = function() {
+                            users.save($scope.data());
+                            alert("User saved!");
+                        };
+                        
+                       $scope.update = function() {
+                            users.update($scope.data());
+                            alert("User updated!");
+                        };
+ 
+                                        
+                } ]);
+    </script>
+</body>
+</html>
