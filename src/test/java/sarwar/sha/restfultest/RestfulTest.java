@@ -51,9 +51,11 @@ public class RestfulTest {
 
     @Before
     public void setUp() throws Exception {
-
+        
+       	ClassLoader classLoader = getClass().getClassLoader();
+    	File file = new File(classLoader.getResource("dataSet.xml").getFile());
         IDataSet dataSet =
-            new FlatXmlDataSetBuilder().build(new File("C:/Users/ssha/workspace/ssha/src/main/resources/dataSet.xml"));
+            new FlatXmlDataSetBuilder().build(file);
         IDatabaseConnection dbConn =
             new DatabaseDataSourceConnection(dataSource);
         DatabaseOperation.CLEAN_INSERT.execute(dbConn, dataSet);
